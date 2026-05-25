@@ -1,0 +1,1328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HamaraMarket — India's Premier Startup Staffing Ecosystem</title>
+    <style>
+        /* --- HIGH-END SYSTEM CONSTANTS --- */
+        :root {
+            --bg-color: #000000;
+            --surface-card: #0a0a0a;
+            --surface-glass: rgba(12, 12, 12, 0.7);
+            --text-main: #ffffff;
+            --text-muted: #888888;
+            --border-color: #1c1c1c;
+            --border-hover: #ffffff;
+            --accent-glow: #ffffff;
+            --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            --font-mono: ui-monospace, SFMono-Regular, SF Pro Mono, Menlo, monospace;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: var(--font-sans);
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            line-height: 1.4;
+            -webkit-font-smoothing: antialiased;
+            min-height: 100vh;
+        }
+
+        section, .job-item-row, .btn, nav a, .docs-nav-item, .profile-link-card, .course-card {
+            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* --- AUTHENTICATION GATE --- */
+        #loginGate {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.99);
+            backdrop-filter: blur(20px);
+            z-index: 2000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .login-box {
+            width: 100%;
+            max-width: 400px;
+            background: var(--surface-card);
+            border: 1px solid var(--border-color);
+            padding: 40px;
+            animation: fadeInUp 0.4s ease;
+        }
+
+        /* --- CORE APPLICATION NAVIGATION --- */
+        header {
+            border-bottom: 1px solid var(--border-color);
+            position: sticky;
+            top: 0;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(12px);
+            z-index: 100;
+        }
+
+        .nav-container {
+            max-width: 1300px;
+            margin: 0 auto;
+            padding: 16px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 16px;
+            font-weight: 800;
+            letter-spacing: -0.03em;
+            text-transform: uppercase;
+            cursor: pointer;
+            color: #ffffff;
+        }
+
+        .logo span {
+            color: var(--text-muted);
+            font-weight: 400;
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 24px;
+        }
+
+        nav a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            position: relative;
+        }
+
+        nav a:hover, nav a.active {
+            color: #ffffff;
+        }
+
+        main {
+            max-width: 1300px;
+            margin: 0 auto;
+            padding: 40px 24px;
+        }
+
+        .view-section {
+            display: none;
+            animation: fadeInUp 0.4s ease;
+        }
+
+        .view-section.active-view {
+            display: block;
+        }
+
+        /* --- HERO AREA --- */
+        .hero {
+            margin-bottom: 40px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 40px;
+        }
+
+        .meta-tag {
+            font-family: var(--font-mono);
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .meta-tag::before {
+            content: "◆";
+            color: #ffffff;
+        }
+
+        h1 {
+            font-size: 42px;
+            font-weight: 800;
+            letter-spacing: -0.03em;
+            line-height: 1.1;
+            margin-bottom: 20px;
+        }
+
+        h1 span {
+            color: var(--text-muted);
+            font-weight: 300;
+        }
+
+        .hero-desc {
+            font-size: 15px;
+            color: var(--text-muted);
+            max-width: 650px;
+            margin-bottom: 32px;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 10px 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-decoration: none;
+            border: 1px solid var(--border-color);
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+        }
+
+        .btn-primary { background-color: #ffffff; color: #000000; border-color: #ffffff; }
+        .btn-primary:hover { background-color: #dddddd; border-color: #dddddd; }
+        .btn-secondary { background-color: transparent; color: var(--text-main); }
+        .btn-secondary:hover { background-color: #ffffff; color: #000000; border-color: #ffffff; }
+        .btn-danger { background-color: transparent; color: #ff4444; border-color: #551111; }
+        .btn-danger:hover { background-color: #ff4444; color: #000000; border-color: #ff4444; }
+
+        /* --- VISUAL DIAGRAM ARCHITECTURE PANELS --- */
+        .diagram-canvas {
+            background: #020202;
+            border: 1px dashed var(--border-color);
+            padding: 24px;
+            margin: 20px 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .diagram-row-flow {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+            max-width: 500px;
+            margin: 12px 0;
+            position: relative;
+        }
+
+        .diagram-node {
+            background: var(--surface-card);
+            border: 1px solid var(--border-color);
+            padding: 10px 16px;
+            font-family: var(--font-mono);
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+            text-align: center;
+            min-width: 130px;
+        }
+
+        .diagram-node.active-node {
+            border-color: #ffffff;
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
+        }
+
+        .diagram-vector-line {
+            flex: 1;
+            height: 1px;
+            background: dashed var(--border-color);
+            border-top: 1px dashed var(--border-color);
+            margin: 0 10px;
+            position: relative;
+        }
+
+        .diagram-vector-line::after {
+            content: "➔";
+            position: absolute;
+            right: 0;
+            top: -7px;
+            font-size: 10px;
+            color: var(--text-muted);
+        }
+
+        /* --- ADVANCED HIGH-FIDELITY PICTURE / PLACES GLASS CONTAINER --- */
+        .media-placeholder-frame {
+            position: relative;
+            width: 100%;
+            height: 240px;
+            background: linear-gradient(135deg, #050505 0%, #0d0d0d 100%);
+            border: 1px solid var(--border-color);
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 20px 0;
+        }
+
+        .media-svg-overlay {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            opacity: 0.15;
+            pointer-events: none;
+        }
+
+        .media-caption-tag {
+            position: absolute;
+            bottom: 12px;
+            left: 12px;
+            background: rgba(0, 0, 0, 0.85);
+            border: 1px solid var(--border-color);
+            padding: 4px 10px;
+            font-family: var(--font-mono);
+            font-size: 10px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+        }
+
+        /* --- COURSE SYLLABUS DIRECTORY GRID --- */
+        .syllabus-module-stack {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: 24px;
+        }
+
+        .syllabus-module-node {
+            border: 1px solid var(--border-color);
+            background: var(--surface-card);
+            padding: 16px;
+        }
+
+        .syllabus-meta {
+            font-family: var(--font-mono);
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-bottom: 4px;
+        }
+
+        /* --- VIDEO IFRAME RESPONSIVE WRAPPER --- */
+        .video-container-wrapper {
+            position: relative;
+            width: 100%;
+            padding-bottom: 56.25%; /* 16:9 Aspect Ratio */
+            height: 0;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+            background: #000000;
+            margin: 24px 0;
+        }
+
+        .video-container-wrapper iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: 0;
+        }
+
+        /* --- FOUNDER BLUEPRINT SHEET --- */
+        .founder-blueprint-panel {
+            background: var(--surface-card);
+            border: 1px solid var(--border-color);
+            padding: 32px;
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 40px;
+            align-items: start;
+        }
+
+        .founder-identity-block {
+            border-right: 1px solid var(--border-color);
+            padding-right: 40px;
+        }
+
+        .founder-name { font-size: 26px; font-weight: 800; letter-spacing: -0.02em; color: #ffffff; margin-bottom: 4px; }
+        .founder-title { font-family: var(--font-mono); font-size: 11px; text-transform: uppercase; color: var(--text-muted); letter-spacing: 0.03em; margin-bottom: 24px; }
+        .venture-capsule-grid { display: flex; flex-direction: column; gap: 10px; }
+        
+        .venture-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px;
+            background: #000000;
+            border: 1px solid var(--border-color);
+            font-size: 12px;
+            text-decoration: none;
+            color: inherit;
+        }
+        .venture-row:hover { border-color: var(--border-hover); }
+        .venture-status { font-family: var(--font-mono); font-size: 10px; color: var(--text-muted); }
+
+        .founder-details-content h4 {
+            font-family: var(--font-mono);
+            font-size: 11px;
+            text-transform: uppercase;
+            color: #ffffff;
+            margin-top: 24px;
+            margin-bottom: 12px;
+            letter-spacing: 0.05em;
+        }
+        .founder-details-content h4:first-of-type { margin-top: 0; }
+        .founder-bio-text { font-size: 14px; color: var(--text-muted); line-height: 1.6; margin-bottom: 28px; }
+
+        .profile-social-channels-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-top: 12px;
+        }
+
+        .profile-link-card {
+            background: #000000;
+            border: 1px solid var(--border-color);
+            padding: 14px;
+            text-align: center;
+            text-decoration: none;
+            color: var(--text-muted);
+            font-family: var(--font-mono);
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+            font-weight: 600;
+        }
+        .profile-link-card:hover { border-color: var(--border-hover); color: #ffffff; }
+
+        /* --- STATS --- */
+        .stats-row { display: flex; margin-top: 40px; gap: 48px; }
+        .stat-box { display: flex; gap: 12px; }
+        .stat-value { font-size: 32px; font-weight: 800; line-height: 1; color: #ffffff; }
+        .stat-label { font-family: var(--font-mono); font-size: 10px; text-transform: uppercase; color: var(--text-muted); display: flex; flex-direction: column; justify-content: center; }
+
+        /* --- CONTAINER HEADERS --- */
+        .section-header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 24px; border-bottom: 1px solid var(--border-color); padding-bottom: 12px; }
+        .section-title { font-size: 20px; font-weight: 700; letter-spacing: -0.01em; }
+        .section-context { font-family: var(--font-mono); font-size: 11px; color: var(--text-muted); text-transform: uppercase; }
+
+        /* --- JOB MATRIX --- */
+        .jobs-matrix-stack { display: flex; flex-direction: column; gap: 1px; background-color: var(--border-color); border: 1px solid var(--border-color); }
+        .job-item-row { background-color: var(--bg-color); padding: 16px 20px; display: grid; grid-template-columns: 2.5fr 1.5fr 1.5fr 2fr auto; align-items: center; gap: 20px; }
+        .job-item-row:hover { background-color: #060606; }
+        .job-title-block { display: flex; flex-direction: column; }
+        .job-main-title { font-size: 14px; font-weight: 700; color: #ffffff; letter-spacing: -0.01em; }
+        .job-sub-info { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+        .job-metric-text { font-family: var(--font-mono); font-size: 12px; color: #ffffff; }
+        .tag-capsule-container { display: flex; gap: 6px; flex-wrap: wrap; }
+        .mini-tag { font-family: var(--font-mono); font-size: 10px; padding: 2px 6px; background: #111111; color: var(--text-muted); border: 1px solid var(--border-color); text-transform: uppercase; }
+        .job-action-cell { display: flex; gap: 8px; align-items: center; }
+
+        /* --- NEWSROOM --- */
+        .news-single-column { max-width: 800px; margin: 0 auto; display: flex; flex-direction: column; gap: 16px; }
+        .news-entry-card { background: var(--surface-card); border: 1px solid var(--border-color); padding: 20px; }
+        .news-header-meta { font-family: var(--font-mono); font-size: 11px; color: #ffffff; margin-bottom: 8px; display: flex; justify-content: space-between; }
+        .news-body-content { font-size: 14px; color: var(--text-muted); line-height: 1.5; }
+
+        /* --- EDITORIAL BLOG --- */
+        .blog-grid-layout { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
+        .blog-card-node { background: var(--surface-card); border: 1px solid var(--border-color); padding: 24px; display: flex; flex-direction: column; justify-content: space-between; }
+        .blog-expandable-text { max-height: 0; overflow: hidden; transition: max-height 0.3s ease; font-size: 13px; color: var(--text-muted); line-height: 1.6; }
+        .blog-expandable-text.is-open { max-height: 2000px; padding-top: 12px; margin-top: 12px; border-top: 1px dotted var(--border-color); overflow-y: visible; }
+
+        /* --- DOCUMENTATION TREE --- */
+        .docs-layout-grid { display: grid; grid-template-columns: 260px 1fr; gap: 32px; }
+        .docs-sidebar-nav { display: flex; flex-direction: column; gap: 4px; }
+        .docs-nav-item { font-family: var(--font-mono); font-size: 12px; padding: 12px 14px; text-align: left; background: transparent; border: 1px solid transparent; color: var(--text-muted); cursor: pointer; }
+        .docs-nav-item:hover, .docs-nav-item.active-doc-link { color: #ffffff; background: #0c0c0c; border-left: 2px solid #ffffff; }
+        .docs-main-viewport { border: 1px solid var(--border-color); padding: 32px; background: var(--surface-card); }
+        .docs-pane { display: none; }
+        .docs-pane.active-pane { display: block; }
+        .code-block-wrapper { background-color: #020202; padding: 16px; margin: 20px 0; border-left: 2px solid #ffffff; overflow-x: auto; }
+        code { font-family: var(--font-mono); font-size: 12px; color: #e0e0e0; display: block; white-space: pre; }
+
+        /* --- INPUT FORM MANAGEMENT LAYOUTS --- */
+        .form-wrapper { max-width: 600px; margin: 0 auto; border: 1px solid var(--border-color); padding: 32px; background: var(--surface-card); }
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; font-family: var(--font-mono); font-size: 11px; text-transform: uppercase; margin-bottom: 6px; color: #ffffff; }
+        .form-control { width: 100%; padding: 10px 12px; border: 1px solid var(--border-color); background: #000000; font-family: var(--font-sans); font-size: 13px; color: #ffffff; outline: none; }
+        .form-control:focus { border-color: #ffffff; }
+
+        /* --- TERMINAL CONSOLE WIDGET --- */
+        .terminal-dock-container { position: fixed; bottom: 24px; right: 24px; width: 340px; background: #050505; border: 1px solid var(--border-color); z-index: 1000; }
+        .terminal-bar-header { background: #0f0f0f; padding: 12px 16px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
+        .pulse-indicator { width: 6px; height: 6px; background: #ffffff; border-radius: 50%; display: inline-block; }
+        .terminal-feed-body { display: flex; flex-direction: column; height: 280px; }
+        .terminal-scroller { flex: 1; padding: 12px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; }
+        .terminal-line { font-size: 12px; line-height: 1.4; font-family: var(--font-mono); white-space: pre-line; }
+        .terminal-line.reply-node { color: var(--text-muted); border-left: 2px solid #ffffff; padding-left: 6px; }
+        .terminal-input-row { display: flex; border-top: 1px solid var(--border-color); }
+        .terminal-input-row input { flex: 1; background: transparent; border: none; padding: 10px; color: #ffffff; font-size: 12px; outline: none; font-family: var(--font-mono); }
+
+        .toast-banner { position: fixed; bottom: 24px; left: 24px; background: #ffffff; color: #000000; padding: 12px 20px; font-family: var(--font-mono); font-size: 11px; text-transform: uppercase; font-weight: 700; display: none; z-index: 3000; }
+
+        /* --- RESPONSIVE FILTERS --- */
+        @media (max-width: 850px) {
+            .job-item-row { grid-template-columns: 1fr; gap: 12px; padding: 16px; }
+            .job-action-cell { text-align: left; margin-top: 8px; width: 100%; justify-content: flex-start; }
+            .founder-blueprint-panel { grid-template-columns: 1fr; gap: 24px; padding: 20px; }
+            .founder-identity-block { border-right: none; padding-right: 0; padding-bottom: 20px; border-bottom: 1px solid var(--border-color); }
+            .profile-social-channels-grid { grid-template-columns: 1fr; }
+            .blog-grid-layout, .docs-layout-grid { grid-template-columns: 1fr; }
+            h1 { font-size: 32px; }
+            .stats-row { flex-direction: column; gap: 16px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- CONTROL VERIFICATION GATEWAY -->
+    <div id="loginGate">
+        <div class="login-box">
+            <div class="meta-tag" style="margin-bottom: 12px;">Security Verification Protocol</div>
+            <h2 style="font-size: 20px; margin-bottom: 20px; letter-spacing: -0.02em;">Initialize Account Session</h2>
+            <form onsubmit="handleUserAuthentication(event)">
+                <div class="form-group">
+                    <label for="userAccessEmail">Your Registered Email</label>
+                    <input type="email" id="userAccessEmail" class="form-control" placeholder="name@domain.com" required>
+                </div>
+                <div class="form-group">
+                    <label for="userAccessName">Your Legal Name</label>
+                    <input type="text" id="userAccessName" class="form-control" placeholder="Enter full name" required>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%;">Authorize Handshake</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- TERMINAL ASSISTANT HUB -->
+    <div class="terminal-dock-container" id="terminalConsoleDock">
+        <div class="terminal-bar-header" onclick="toggleTerminalView()">
+            <div style="display:flex; align-items:center; gap:8px; font-family:var(--font-mono); font-size:11px; font-weight:700;">
+                <span class="pulse-indicator"></span> CONSOLE_NODE
+            </div>
+            <span id="terminalToggleIcon" style="font-size:11px; color:var(--text-muted);">[ CLOSE ]</span>
+        </div>
+        <div class="terminal-feed-body" id="terminalConsoleBody">
+            <div class="terminal-scroller" id="terminalLogsStream">
+                <div class="terminal-line reply-node">
+                    Ecosystem online. AI context alignment system loaded successfully.
+                </div>
+            </div>
+            <form class="terminal-input-row" onsubmit="handleTerminalCommandSubmit(event)">
+                <input type="text" id="terminalInputField" placeholder="Ask about HamaraMarket, the founder, or links..." autocomplete="off" required>
+            </form>
+        </div>
+    </div>
+
+    <!-- GLOBAL SITE TRACK NAVIGATION -->
+    <header>
+        <div class="nav-container">
+            <div class="logo" onclick="switchView('home')">Hamara<span>Market</span></div>
+            <nav>
+                <ul>
+                    <li><a id="nav-home" class="active" onclick="switchView('home')">Ecosystem</a></li>
+                    <li><a id="nav-post" onclick="switchView('post')">Deploy Job</a></li>
+                    <li><a id="nav-news" onclick="switchView('news')">Newsroom</a></li>
+                    <li><a id="nav-docs" onclick="switchView('docs')">Documentation</a></li>
+                    <li><a id="nav-blog" onclick="switchView('blog')">Codes-Aur-Khana</a></li>
+                    <li><a id="nav-profile" onclick="switchView('profile')">Profile</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <div id="toastNotification" class="toast-banner">Action Executed</div>
+
+        <!-- VIEW: MAIN LIVE ECOSYSTEM MATRIX -->
+        <section id="view-home" class="view-section active-view">
+            <div class="hero">
+                <div class="meta-tag">India's Premier Startup Employment Engine</div>
+                <h1>Architecting structural placement channels<br><span>for scaling technology ventures.</span></h1>
+                <p class="hero-desc">HamaraMarket serves as the infrastructure tier for engineering teams. We connect technical production groups across India through high-density data matrices, free from framework clutter.</p>
+                
+                <div class="btn-group">
+                    <button class="btn btn-primary" onclick="document.getElementById('matrix-anchor').scrollIntoView({behavior: 'smooth'})">Explore Open Ranks</button>
+                    <button class="btn btn-secondary" onclick="switchView('profile')">View Architect Profile</button>
+                </div>
+
+                <div class="stats-row">
+                    <div class="stat-box">
+                        <div class="stat-value" id="stat-count-nodes">0</div>
+                        <div class="stat-label"><div>Verified</div><div>Ranks Live</div></div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-value" id="stat-count-news">0</div>
+                        <div class="stat-label"><div>Secure</div><div>Logs Saved</div></div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-value">100%</div>
+                        <div class="stat-label"><div>Framework</div><div>Free Vanilla JS</div></div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="matrix-anchor">
+                <div class="section-header">
+                    <div class="section-title">Active Strategic Ranks</div>
+                    <div class="section-context">[ Sync Stream Live ]</div>
+                </div>
+                <div class="jobs-matrix-stack" id="jobsMatrixDirectory"></div>
+            </div>
+        </section>
+
+        <!-- VIEW: DEDICATED FOUNDER PROFILE SECTION (WITH IMAGE & DIAGRAM SPECIFICATIONS) -->
+        <section id="view-profile" class="view-section">
+            <div class="section-header">
+                <div class="section-title">Architect Blueprint Sheet</div>
+                <div class="section-context">[ Author Core Profile ]</div>
+            </div>
+            
+            <div class="founder-blueprint-panel">
+                <div class="founder-identity-block">
+                    <!-- SYSTEM PROFILE GRAPHIC PICTURE PLACEHOLDER -->
+                    <div class="media-placeholder-frame" style="height: 200px; margin-top: 0;">
+                        <svg class="media-svg-overlay" viewBox="0 0 100 100" preserveAspectRatio="none">
+                            <circle cx="50" cy="50" r="40" stroke="#1c1c1c" stroke-width="1" fill="none"/>
+                            <path d="M10,90 Q50,40 90,90" stroke="#1c1c1c" stroke-width="1" fill="none"/>
+                        </svg>
+                        <div style="font-family: var(--font-mono); font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-muted); text-align: center; z-index: 5;">
+                            [ ARCHITECT PHOTO IDENTITY ]<br><span style="font-size: 9px; opacity: 0.5;">SANTANU_KONWAR.RAW</span>
+                        </div>
+                        <div class="media-caption-tag">IMG_REF // SK_IDENTITY_V4</div>
+                    </div>
+
+                    <div class="founder-name">Santanu Konwar</div>
+                    <div class="founder-title">Founder & Systems Architect</div>
+                    
+                    <div style="font-family: var(--font-mono); font-size: 11px; text-transform: uppercase; color: #ffffff; margin-bottom: 12px; letter-spacing: 0.05em;">Venture Portfolio</div>
+                    <div class="venture-capsule-grid">
+                        <a href="#" class="venture-row" onclick="executeToastBannerAlert('Navigating to HamaraMarket Hub')">
+                            <span style="font-weight:700;">HamaraMarket</span>
+                            <span class="venture-status">// LIVE LINK</span>
+                        </a>
+                        <a href="#" class="venture-row" onclick="executeToastBannerAlert('Navigating to FireProduct Studio')">
+                            <span style="font-weight:700;">FireProduct</span>
+                            <span class="venture-status">// PROD LINK</span>
+                        </a>
+                        <a href="#" class="venture-row" onclick="executeToastBannerAlert('Navigating to HyperCreators Platform')">
+                            <span style="font-weight:700;">HyperCreators</span>
+                            <span class="venture-status">// DEPLOY LINK</span>
+                        </a>
+                    </div>
+                </div>
+                
+                <div class="founder-details-content">
+                    <h4>Core Profile Summary</h4>
+                    <p class="founder-bio-text">
+                        Web developer, technical designer, and serial entrepreneur driving high-performance web platform structures. Focused on engineering high-speed digital environments across India using native stack infrastructure—built cleanly with pure HTML, CSS, and vanilla JS code configurations.
+                    </p>
+
+                    <h4>Ecosystem Infrastructure Mapping</h4>
+                    <!-- STRUCTURAL ROUTING MAP DIAGRAM -->
+                    <div class="diagram-canvas">
+                        <div class="diagram-row-flow">
+                            <div class="diagram-node active-node">HamaraMarket</div>
+                            <div class="diagram-vector-line"></div>
+                            <div class="diagram-node">Job Portal Data</div>
+                        </div>
+                        <div class="diagram-row-flow">
+                            <div class="diagram-node">FireProduct</div>
+                            <div class="diagram-vector-line"></div>
+                            <div class="diagram-node">Product Lab</div>
+                        </div>
+                        <div class="diagram-row-flow">
+                            <div class="diagram-node">Codes aur khana</div>
+                            <div class="diagram-vector-line"></div>
+                            <div class="diagram-node">Blogging platform</div>
+                        </div>
+                    </div>
+                    
+                    <h4>Verified Core Architecture</h4>
+                    <div class="tag-capsule-container" style="margin-bottom: 28px;">
+                        <span class="mini-tag" style="border-color:#fff; color:#fff;">Pure HTML5</span>
+                        <span class="mini-tag" style="border-color:#fff; color:#fff;">CSS Variable Architecture</span>
+                        <span class="mini-tag" style="border-color:#fff; color:#fff;">Vanilla ECMAScript</span>
+                        <span class="mini-tag" style="border-color:#fff; color:#fff;">System Optimization</span>
+                        <span class="mini-tag" style="border-color:#fff; color:#fff;">Product Strategy</span>
+                    </div>
+
+                    <h4>Social Handshake Protocols</h4>
+                    <div class="profile-social-channels-grid">
+                        <a href="https://github.com/konwarsantanu687-ui" target="_blank" class="profile-link-card">GitHub // Src</a>
+                        <a href="https://www.linkedin.com/in/santanu-konwar-8b17143a8" target="_blank" class="profile-link-card">LinkedIn // Net</a>
+                        <a href="https://www.instagram.com/_santanu_konwar/" target="_blank" class="profile-link-card">Instagram // Feed</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- VIEW: EXCLUSIVE NEWSROOM BROADCAST STREAM -->
+        <section id="view-news" class="view-section">
+            <div class="section-header">
+                <div class="section-title">Founder Corporate Broadcasts</div>
+                <div class="section-context">[ Read Only Ledger — Admin Controlled ]</div>
+            </div>
+            <div class="news-single-column" id="newsStreamContainer"></div>
+        </section>
+
+        <!-- VIEW: DEPLOY NEW JOB ALLOCATION -->
+        <section id="view-post" class="view-section">
+            <div class="section-header">
+                <div class="section-title">Deploy Resource Allocation Node</div>
+                <div class="section-context">[ Input Form v3.1 ]</div>
+            </div>
+
+            <div class="form-wrapper">
+                <form id="jobPlacementForm" onsubmit="handleJobFormSubmission(event)">
+                    <div class="form-group">
+                        <label for="postName">Hiring Authority / Corporate Entity</label>
+                        <input type="text" id="postName" class="form-control" placeholder="e.g. HyperCreators" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="postEmail">Target Routing Gmail Address</label>
+                        <input type="email" id="postEmail" class="form-control" placeholder="operations@domain.com" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="postPhone">Direct Verification Phone Coordinate</label>
+                        <input type="tel" id="postPhone" class="form-control" placeholder="+91 XXXXX XXXXX" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="postTitle">Operating Allocation Title</label>
+                        <input type="text" id="postTitle" class="form-control" placeholder="e.g. Lead Systems Engineer" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="postCategory">Core Operational Division</label>
+                        <input type="text" id="postCategory" class="form-control" placeholder="e.g. Core Infrastructure" required>
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                        <div class="form-group">
+                            <label for="postBudget">Compensation Matrix (Monthly)</label>
+                            <input type="text" id="postBudget" class="form-control" placeholder="e.g. ₹1,50,000" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="postLocation">Geographic Operations Node</label>
+                            <input type="text" id="postLocation" class="form-control" placeholder="e.g. Bangalore / Remote" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="postDescription">Core Responsibilities & Technical Task Briefing</label>
+                        <textarea id="postDescription" class="form-control" style="min-height: 100px;" placeholder="Outline the primary engineering goals..." required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="postTags">Technical Skill Framework Tags (Comma Separated)</label>
+                        <input type="text" id="postTags" class="form-control" placeholder="HTML, CSS, UI, Architecture">
+                    </div>
+                    <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 8px;">Transmit Live Node Allocation</button>
+                </form>
+            </div>
+        </section>
+
+        <!-- VIEW: GMAIL APPLICATION INTERCEPT ROUTER -->
+        <section id="view-apply" class="view-section">
+            <div class="section-header">
+                <div class="section-title">Application Deployment Handshake</div>
+                <div class="section-context" id="applyTargetContext">[ Initializing Link Route ]</div>
+            </div>
+
+            <div class="form-wrapper">
+                <form id="jobApplicationForm" onsubmit="handleApplicationSubmission(event)">
+                    <input type="hidden" id="applyJobId">
+                    <div class="form-group">
+                        <label>Target Placement Objective</label>
+                        <input type="text" id="applyJobTitleDisplay" class="form-control" readonly style="background: #080808; border-color: transparent;">
+                    </div>
+                    <div class="form-group">
+                        <label for="applyName">Applicant Full Identity</label>
+                        <input type="text" id="applyName" class="form-control" placeholder="Your full name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="applyEmail">Applicant Gmail Channel</label>
+                        <input type="email" id="applyEmail" class="form-control" placeholder="name@gmail.com" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="applyPhone">Contact Verification Number</label>
+                        <input type="tel" id="applyPhone" class="form-control" placeholder="+91 XXXXX XXXXX" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="applyProposal">Cover Pitch Briefing & Portfolio Presentation</label>
+                        <textarea id="applyProposal" class="form-control" style="min-height: 120px; line-height:1.5;" placeholder="Provide links and outline project capabilities..." required></textarea>
+                    </div>
+                    <div class="btn-group" style="width: 100%;">
+                        <button type="submit" class="btn btn-primary" style="flex: 2;">Route Transmission via Gmail Client</button>
+                        <button type="button" class="btn btn-secondary" style="flex: 1;" onclick="switchView('home')">Abort</button>
+                    </div>
+                </form>
+            </div>
+        </section>
+
+        <!-- VIEW: INFRASTRUCTURE TECHNICAL LEDGER (REBUILT PROFESSIONAL TRAINING COURSE MANIFEST) -->
+        <section id="view-docs" class="view-section">
+            <div class="section-header">
+                <div class="section-title">Ecosystem Syllabus & Platform Blueprints</div>
+                <div class="section-context">Course Specification Matrix</div>
+            </div>
+
+            <div class="docs-layout-grid">
+                <div class="docs-sidebar-nav">
+                    <button class="docs-nav-item active-doc-link" onclick="switchDocPane('architecture', this)">1. State Engine Setup</button>
+                    <button class="docs-nav-item" onclick="switchDocPane('jobs-protocol', this)">2. Cache Core Serialization</button>
+                    <button class="docs-nav-item" onclick="switchDocPane('layout-system', this)">3. CSS Grid Layout Engine</button>
+                </div>
+                <div class="docs-main-viewport">
+                    
+                    <!-- MODULE 1 -->
+                    <div id="pane-architecture" class="docs-pane active-pane">
+                        <div class="meta-tag" style="margin-bottom:8px;">Core Course // Module 01</div>
+                        <h2 style="font-size:22px; font-weight:800; margin-bottom:12px; letter-spacing:-0.02em;">State Engine Layout Control</h2>
+                        <p style="font-size:14px; color:var(--text-muted); margin-bottom:16px; line-height:1.6;">
+                            Positions map directly across standard array structures inside single-dimension local database vectors. This training blueprint focuses on manipulating real-time interfaces without data overhead or heavy virtual state synchronization layers.
+                        </p>
+                        
+                        <h3 style="font-size:12px; font-family:var(--font-mono); text-transform:uppercase; margin-top:24px; margin-bottom:8px; color:#fff;">System Architecture Vector:</h3>
+                        <!-- HIGH END VECTOR DIAGRAM -->
+                        <div class="diagram-canvas">
+                            <div class="diagram-row-flow">
+                                <div class="diagram-node active-node">Form Submission</div>
+                                <div class="diagram-vector-line"></div>
+                                <div class="diagram-node">Local Memory Cache</div>
+                            </div>
+                            <div class="diagram-row-flow" style="margin-top:8px;">
+                                <div class="diagram-node" style="opacity:0.5;">Local Memory Cache</div>
+                                <div class="diagram-vector-line"></div>
+                                <div class="diagram-node active-node">DOM Matrix Render</div>
+                            </div>
+                        </div>
+
+                        <h3 style="font-size:12px; font-family:var(--font-mono); text-transform:uppercase; margin-bottom:8px; color:#fff;">Implementation Blueprint:</h3>
+                        <div class="code-block-wrapper">
+                            <code>// Zero framework overhead state node definition
+const startupAllocationNodes = [
+    {
+        id: "node-id-string",
+        title: "Lead Production Engineer",
+        company: "FireProduct"
+    }
+];</code>
+                        </div>
+                    </div>
+                    
+                    <!-- MODULE 2 -->
+                    <div id="pane-jobs-protocol" class="docs-pane">
+                        <div class="meta-tag" style="margin-bottom:8px;">Core Course // Module 02</div>
+                        <h2 style="font-size:22px; font-weight:800; margin-bottom:12px; letter-spacing:-0.02em;">Local Cache Array Serialization</h2>
+                        <p style="font-size:14px; color:var(--text-muted); margin-bottom:16px; line-height:1.6;">
+                            The storage serialization track records object configurations directly inside the client browser data pipeline. This setup ensures high processing speeds and complete persistence across browser refreshes.
+                        </p>
+                        
+                        <div class="code-block-wrapper">
+                            <code>function updateLocalStorageCache(payloadData) {
+    localStorage.setItem('hm_dense_cache_v4', JSON.stringify(payloadData));
+}</code>
+                        </div>
+                    </div>
+
+                    <!-- MODULE 3 -->
+                    <div id="pane-layout-system" class="docs-pane">
+                        <div class="meta-tag" style="margin-bottom:8px;">Core Course // Module 03</div>
+                        <h2 style="font-size:22px; font-weight:800; margin-bottom:12px; letter-spacing:-0.02em;">CSS Grid Layout Engine</h2>
+                        <p style="font-size:14px; color:var(--text-muted); margin-bottom:16px; line-height:1.6;">
+                            Learn to construct high-density layouts using pure CSS variables and adaptive structural grids. This removes the need for bulky UI kits or helper classes entirely.
+                        </p>
+
+                        <!-- HIGH END DIAGRAM LAYER FOR CSS CORE DISPLAY -->
+                        <div class="diagram-canvas" style="padding:12px; border-style:solid;">
+                            <div style="width:100%; display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px;">
+                                <div style="border:1px solid #333; padding:20px; font-size:10px; font-family:var(--font-mono); text-align:center;">Grid Node 1<br>(2.5fr)</div>
+                                <div style="border:1px solid #333; padding:20px; font-size:10px; font-family:var(--font-mono); text-align:center;">Grid Node 2<br>(1.5fr)</div>
+                                <div style="border:1px solid #333; padding:20px; font-size:10px; font-family:var(--font-mono); text-align:center;">Grid Node 3<br>(1.5fr)</div>
+                            </div>
+                        </div>
+                        
+                        <div class="code-block-wrapper">
+                            <code>.job-item-row {
+    display: grid;
+    grid-template-columns: 2.5fr 1.5fr 1.5fr 2fr auto;
+    align-items: center;
+}</code>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- VIEW: CODES-AUR-KHANA INSIGHT LOGS -->
+        <section id="view-blog" class="view-section">
+            <div class="section-header">
+                <div class="section-title">Codes-Aur-Khana Training Logs</div>
+                <div class="section-context">Premium Technical Framework Courses</div>
+            </div>
+            <div class="blog-grid-layout" id="blogCardsGrid"></div>
+        </section>
+    </main>
+
+    <script>
+        /* --- HARDCODED ENGINE LEDGERS --- */
+        const initialHardcodedNewsLedger = [
+            { 
+                id: "news-entry-1", 
+                category: "SYSTEM UPGRADE", 
+                timestamp: "May 2026", 
+                text: "Ecosystem design upgraded to a premium, high-density professional layout. Large, oversized card components have been condensed into clean, multi-column row allocations to ensure fast scannability and optimal screen efficiency." 
+            },
+            { 
+                id: "news-entry-2", 
+                category: "SECURITY LOG", 
+                timestamp: "May 2026", 
+                text: "News management endpoints have been migrated to code-driven configuration matrices. Public input forms for global announcements have been deactivated to preserve strict data authenticity across the platform." 
+            }
+        ];
+
+        const initialSeedPositionsList = [
+            {
+                id: "pos-node-1",
+                title: "Sprint Zero Engineer",
+                company: "FireProduct",
+                category: "Product Studio",
+                budget: "₹1,20,000 / mo",
+                location: "Remote, India",
+                desc: "Develop rapid wireframe deployments and light architecture tracks using pure native browser tools without bulky dependencies.",
+                tags: ["HTML", "CSS", "Vanilla JS"],
+                email: "santanu@hamaramarket.com",
+                phone: "+91 98765 43210",
+                postedBy: "Santanu Konwar"
+            },
+            {
+                id: "pos-node-2",
+                title: "Creator Growth Manager",
+                company: "HyperCreators",
+                category: "Growth & Marketing",
+                budget: "₹95,000 / mo",
+                location: "Bangalore Node",
+                desc: "Scale user growth tracking strategies and deployment mechanics to expand our core creator network platforms across target regions.",
+                tags: ["Marketing", "Growth", "Data Funnels"],
+                email: "operations@hypercreators.com",
+                phone: "+91 98765 43211",
+                postedBy: "Operations Division"
+            }
+        ];
+
+        /* CODES-AUR-KHANA REBUILT REPOSITORY: INCLUDES EMBEDDED VIDEOS, INLINE PICTURE FRAMES, DIAGRAM MATRIX, AND TECHNICAL SYLLABI EXPLANTIONS */
+        const internalBlogsRepository = [
+            {
+                id: "essay-prompt-eng",
+                title: "Masterclass: Building Modern Platforms with Intelligent Prompt Blueprints",
+                category: "Advanced Course",
+                date: "May 2026",
+                summary: "Complete interactive course detailing structural instructions, pure architectural constraints, and fast application setup frameworks without framework dependencies.",
+                tags: ["Prompt Engine", "No-Framework", "Vanilla JS Architecture"],
+                videoEmbedCode: `<div class="video-container-wrapper"><iframe src="https://youtu.be/jhKvoUfMPgc?si=MKWAWcjnr5FqnYiC" title="ChatGPT-5 Prompt Engineering Explained in 6 Minutes!" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div>`,
+                imageMarkup: `
+                    <div class="media-placeholder-frame">
+                        <svg class="media-svg-overlay" viewBox="0 0 100 100" preserveAspectRatio="none">
+                            <line x1="0" y1="0" x2="100" y2="100" stroke="#1c1c1c" stroke-width="0.5"/>
+                            <line x1="50" y1="0" x2="50" y2="100" stroke="#1c1c1c" stroke-width="0.5"/>
+                        </svg>
+                        <div style="font-family:var(--font-mono); font-size:11px; text-transform:uppercase; color:var(--text-muted); font-weight:700;">[ FIGURE 1.1: DOM CONFIGURATION MAP ]</div>
+                        <div class="media-caption-tag">FILE_REF // DOM_PARSER_DIAGRAM.PNG</div>
+                    </div>
+                `,
+                diagramMarkup: `
+                    <div class="diagram-canvas">
+                        <div class="diagram-row-flow">
+                            <div class="diagram-node active-node">Text Blueprint</div>
+                            <div class="diagram-vector-line"></div>
+                            <div class="diagram-node">AI Compiler</div>
+                        </div>
+                        <div class="diagram-row-flow">
+                            <div class="diagram-node">AI Compiler</div>
+                            <div class="diagram-vector-line"></div>
+                            <div class="diagram-node active-node">Vanilla Codebase</div>
+                        </div>
+                    </div>
+                `,
+                fullText: `
+                    <h4 style="font-family:var(--font-mono); font-size:11px; text-transform:uppercase; color:#fff; margin-bottom:8px; margin-top:16px;">Course Overview & Core Mechanics</h4>
+                    <p style="margin-bottom:12px; line-height:1.6;">Modern system builders use detailed context instructions to rapidly assemble stable feature blocks instead of manually writing repeating boilerplate code patterns. By setting up strict parameters—like using raw HTML, CSS, and vanilla JS—the production output stays clean and optimized for immediate deployment.</p>
+                    
+                    <h4 style="font-family:var(--font-mono); font-size:11px; text-transform:uppercase; color:#fff; margin-bottom:8px; margin-top:16px;">Interactive Architecture Model</h4>
+                    ##DIAGRAM_PLACEHOLDER##
+                    <p style="margin-bottom:12px; line-height:1.6; font-size:13px; color:var(--text-muted);">The flow above shows how a developer's prompt blueprint passes through an AI formatting engine to output directly to the standard document view model, skipping heavy asset compilation tracks entirely.</p>
+                    
+                    ##IMAGE_PLACEHOLDER##
+
+                    <h4 style="font-family:var(--font-mono); font-size:11px; text-transform:uppercase; color:#fff; margin-bottom:8px; margin-top:20px;">Video Lecture Tutorial</h4>
+                    ##VIDEO_PLACEHOLDER##
+
+                    <h4 style="font-family:var(--font-mono); font-size:11px; text-transform:uppercase; color:#fff; margin-bottom:8px; margin-top:20px;">Syllabus Course Requirements</h4>
+                    <div class="syllabus-module-stack">
+                        <div class="syllabus-module-node">
+                            <div class="syllabus-meta">Module 1.1 — Constraint Mapping</div>
+                            <div style="font-size:13px; font-weight:700; color:#fff;">Defining Project Bounds</div>
+                            <p style="font-size:12px; color:var(--text-muted); margin-top:4px;">How to prevent generator drift by restricting third-party imports and modern bundlers.</p>
+                        </div>
+                        <div class="syllabus-module-node">
+                            <div class="syllabus-meta">Module 1.2 — Array Control</div>
+                            <div style="font-size:13px; font-weight:700; color:#fff;">Vanilla Object Processing</div>
+                            <p style="font-size:12px; color:var(--text-muted); margin-top:4px;">Manipulating data matrices safely using standard browser processing streams.</p>
+                        </div>
+                    </div>
+                `
+            },
+            {
+                id: "essay-growth-funnel",
+                title: "Growth Hacking: Organic Growth Funnels for Technical Founders",
+                category: "Marketing Engineering",
+                date: "May 2026",
+                summary: "How technical creators can build automated marketing pathways into their platforms. Maximize user signups using smart referral systems instead of paid ad networks.",
+                tags: ["Growth Engine", "Organic Systems", "Conversion Scaling"],
+                videoEmbedCode: `<div class="video-container-wrapper"><iframe src="https://youtu.be/jhKvoUfMPgc?si=MKWAWcjnr5FqnYiC" title="Marketing Flow Training Video" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div>`,
+                imageMarkup: `
+                    <div class="media-placeholder-frame">
+                        <svg class="media-svg-overlay" viewBox="0 0 100 100" preserveAspectRatio="none">
+                            <polygon points="10,10 90,10 50,90" stroke="#1c1c1c" stroke-width="0.5" fill="none"/>
+                        </svg>
+                        <div style="font-family:var(--font-mono); font-size:11px; text-transform:uppercase; color:var(--text-muted); font-weight:700;">[ FIGURE 2.1: ACQUISITION FUNNEL CONVERSION ]</div>
+                        <div class="media-caption-tag">FILE_REF // MARKETING_CHANNELS_GRAPH.PNG</div>
+                    </div>
+                `,
+                diagramMarkup: `
+                    <div class="diagram-canvas">
+                        <div class="diagram-row-flow">
+                            <div class="diagram-node active-node">Organic Traffic</div>
+                            <div class="diagram-vector-line"></div>
+                            <div class="diagram-node">Landing Capture Node</div>
+                        </div>
+                        <div class="diagram-row-flow">
+                            <div class="diagram-node">Landing Capture Node</div>
+                            <div class="diagram-vector-line"></div>
+                            <div class="diagram-node active-node">Ecosystem Engagement</div>
+                        </div>
+                    </div>
+                `,
+                fullText: `
+                    <h4 style="font-family:var(--font-mono); font-size:11px; text-transform:uppercase; color:#fff; margin-bottom:8px; margin-top:16px;">Ecosystem Distribution Strategies</h4>
+                    <p style="margin-bottom:12px; line-height:1.6;">Deploying an application is just the initial step in the software lifecycle. Technical platforms need to build data capture funnels and sharing mechanics right into their user experience layers. By setting up simple sharing steps and organic search keywords, founders can grow their user base naturally through peer sharing and discovery trends.</p>
+                    
+                    ##DIAGRAM_PLACEHOLDER##
+
+                    ##IMAGE_PLACEHOLDER##
+
+                    <h4 style="font-family:var(--font-mono); font-size:11px; text-transform:uppercase; color:#fff; margin-bottom:8px; margin-top:20px;">Video Execution Walkthrough</h4>
+                    ##VIDEO_PLACEHOLDER##
+
+                    <h4 style="font-family:var(--font-mono); font-size:11px; text-transform:uppercase; color:#fff; margin-bottom:8px; margin-top:20px;">Syllabus Course Requirements</h4>
+                    <div class="syllabus-module-stack">
+                        <div class="syllabus-module-node">
+                            <div class="syllabus-meta">Module 2.1 — Metric Setup</div>
+                            <div style="font-size:13px; font-weight:700; color:#fff;">Monitoring Conversion Ratios</div>
+                            <p style="font-size:12px; color:var(--text-muted); margin-top:4px;">Setting up lightweight collection parameters inside vanilla event structures.</p>
+                        </div>
+                    </div>
+                `
+            }
+        ];
+
+        let platformJobsCache = [];
+
+        /* --- INTERNAL DATA TRACK BINDINGS --- */
+        function initializeEcosystemDataTrack() {
+            const storedJobs = localStorage.getItem('hm_dense_jobs_v4');
+            platformJobsCache = storedJobs ? JSON.parse(storedJobs) : [...initialSeedPositionsList];
+            syncJobsToStorage();
+
+            document.getElementById('stat-count-news').innerText = initialHardcodedNewsLedger.length;
+        }
+
+        function syncJobsToStorage() {
+            localStorage.setItem('hm_dense_jobs_v4', JSON.stringify(platformJobsCache));
+        }
+
+        /* --- DISPLAY LAYOUT RENDER PROCESSORS --- */
+        function renderHighDensityMatrixGrid() {
+            const container = document.getElementById('jobsMatrixDirectory');
+            if(!container) return;
+            container.innerHTML = '';
+            document.getElementById('stat-count-nodes').innerText = platformJobsCache.length;
+
+            platformJobsCache.forEach(job => {
+                const row = document.createElement('div');
+                row.className = 'job-item-row';
+                const tagElements = job.tags.map(t => `<span class="mini-tag">${t.trim()}</span>`).join('');
+
+                row.innerHTML = `
+                    <div class="job-title-block">
+                        <div class="job-main-title">${job.title}</div>
+                        <div class="job-sub-info">${job.company || 'Ecosystem Startup'} • ${job.category}</div>
+                    </div>
+                    <div class="job-metric-text">${job.budget}</div>
+                    <div class="job-metric-text" style="color:var(--text-muted);">📍 ${job.location}</div>
+                    <div class="tag-capsule-container">${tagElements}</div>
+                    <div class="job-action-cell">
+                        <button class="btn btn-primary" style="padding:6px 12px; font-size:11px;" onclick="routeToApplicationFlow('${job.id}')">Apply</button>
+                        <button class="btn btn-danger" style="padding:6px 12px; font-size:11px;" onclick="executeJobPurgeSequence('${job.id}')">Remove</button>
+                    </div>
+                `;
+                container.appendChild(row);
+            });
+        }
+
+        function executeJobPurgeSequence(id) {
+            const index = platformJobsCache.findIndex(j => j.id === id);
+            if (index === -1) return;
+            
+            const targetJob = platformJobsCache[index];
+            const identityConfirmed = confirm(`Are you sure you want to permanently delete the job post allocation for "${targetJob.title}" at "${targetJob.company}"?`);
+            
+            if (identityConfirmed) {
+                platformJobsCache.splice(index, 1);
+                syncJobsToStorage();
+                renderHighDensityMatrixGrid();
+                executeToastBannerAlert("JOB NODE PERMANENTLY REMOVED");
+            }
+        }
+
+        function renderCorporateNewsroomStream() {
+            const container = document.getElementById('newsStreamContainer');
+            if(!container) return;
+            container.innerHTML = '';
+
+            initialHardcodedNewsLedger.forEach(item => {
+                const node = document.createElement('div');
+                node.className = 'news-entry-card';
+                node.innerHTML = `
+                    <div class="news-header-meta">
+                        <span>■ BROADCAST // ${item.category}</span>
+                        <span style="color:var(--text-muted); font-size:11px;">${item.timestamp}</span>
+                    </div>
+                    <div class="news-body-content">${item.text}</div>
+                `;
+                container.appendChild(node);
+            });
+        }
+
+        function renderEditorialLogsGrid() {
+            const container = document.getElementById('blogCardsGrid');
+            if(!container) return;
+            container.innerHTML = '';
+
+            internalBlogsRepository.forEach(post => {
+                const block = document.createElement('div');
+                block.className = 'blog-card-node';
+                const tagsList = post.tags.map(t => `<span class="mini-tag">${t}</span>`).join('');
+
+                // Parse dynamically placed system indicators with actual block modules
+                let completeBodyContent = post.fullText;
+                completeBodyContent = completeBodyContent.replace('##DIAGRAM_PLACEHOLDER##', post.diagramMarkup);
+                completeBodyContent = completeBodyContent.replace('##IMAGE_PLACEHOLDER##', post.imageMarkup);
+                completeBodyContent = completeBodyContent.replace('##VIDEO_PLACEHOLDER##', post.videoEmbedCode);
+
+                block.innerHTML = `
+                    <div style="width:100%;">
+                        <div style="display:flex; justify-content:space-between; margin-bottom:8px; font-family:var(--font-mono); font-size:11px;">
+                            <span style="color:#fff;">${post.category}</span>
+                            <span style="color:var(--text-muted);">${post.date}</span>
+                        </div>
+                        <h3 style="font-size:18px; font-weight:700; color:#fff; margin-bottom:8px; letter-spacing:-0.01em;">${post.title}</h3>
+                        <p style="font-size:13px; color:var(--text-muted); line-height:1.5;">${post.summary}</p>
+                        <div id="textpane-${post.id}" class="blog-expandable-text">${completeBodyContent}</div>
+                    </div>
+                    <div style="margin-top:20px; width:100%;">
+                        <div class="tag-capsule-container" style="margin-bottom:16px;">${tagsList}</div>
+                        <button id="readbtn-${post.id}" class="btn btn-secondary" style="width:100%; font-size:11px; padding:8px;" onclick="toggleBlogPaneExpansion('${post.id}')">Read Full Course Unit</button>
+                    </div>
+                `;
+                container.appendChild(block);
+            });
+        }
+
+        function toggleBlogPaneExpansion(id) {
+            const pane = document.getElementById(`textpane-${id}`);
+            const btn = document.getElementById(`readbtn-${id}`);
+            if(pane.classList.contains('is-open')) {
+                pane.classList.remove('is-open');
+                btn.innerText = "Read Full Course Unit";
+            } else {
+                pane.classList.add('is-open');
+                btn.innerText = "Collapse Course Unit";
+            }
+        }
+
+        /* --- FORM PLACEMENT ENGINE TRANSACTIONS --- */
+        function handleJobFormSubmission(e) {
+            e.preventDefault();
+
+            const createdJobPayload = {
+                id: 'node-' + Date.now(),
+                title: document.getElementById('postTitle').value,
+                company: document.getElementById('postName').value,
+                category: document.getElementById('postCategory').value,
+                budget: document.getElementById('postBudget').value,
+                location: document.getElementById('postLocation').value,
+                desc: document.getElementById('postDescription').value,
+                tags: document.getElementById('postTags').value ? document.getElementById('postTags').value.split(',') : ['General Engineer'],
+                email: document.getElementById('postEmail').value,
+                phone: document.getElementById('postPhone').value,
+                postedBy: document.getElementById('postName').value
+            };
+
+            platformJobsCache.unshift(createdJobPayload);
+            syncJobsToStorage();
+            renderHighDensityMatrixGrid();
+            document.getElementById('jobPlacementForm').reset();
+            executeToastBannerAlert("NODE DEPLOYED SUCCESSFULLY");
+            switchView('home');
+        }
+
+        function routeToApplicationFlow(id) {
+            const selectedJob = platformJobsCache.find(j => j.id === id);
+            if(!selectedJob) return;
+
+            document.getElementById('applyJobId').value = selectedJob.id;
+            document.getElementById('applyJobTitleDisplay').value = `${selectedJob.title} — ${selectedJob.company}`;
+            document.getElementById('applyTargetContext').innerText = `[ Destination Routing Coordinate: ${selectedJob.email} ]`;
+            switchView('apply');
+        }
+
+        function handleApplicationSubmission(e) {
+            e.preventDefault();
+            const targetId = document.getElementById('applyJobId').value;
+            const contextJob = platformJobsCache.find(j => j.id === targetId);
+            if(!contextJob) return;
+
+            const name = document.getElementById('applyName').value;
+            const email = document.getElementById('applyEmail').value;
+            const phone = document.getElementById('applyPhone').value;
+            const proposal = document.getElementById('applyProposal').value;
+
+            const mailSubject = encodeURIComponent(`[Ecosystem Match] Rank Application — ${contextJob.title}`);
+            const mailBody = encodeURIComponent(`Hello ${contextJob.postedBy},\n\nApplicant Identity: ${name}\nContact Email: ${email}\nDirect Telephone Contact: ${phone}\n\nProject Briefing Portfolio Presentation:\n${proposal}`);
+
+            executeToastBannerAlert("LAUNCHING GMAIL ENGINE...");
+            setTimeout(() => {
+                window.location.href = `mailto:${contextJob.email}?subject=${mailSubject}&body=${mailBody}`;
+                document.getElementById('jobApplicationForm').reset();
+                switchView('home');
+            }, 800);
+        }
+
+        /* --- UPGRADED INTELLIGENT CONSOLE CONTROLLER --- */
+        function handleTerminalCommandSubmit(e) {
+            e.preventDefault();
+            const field = document.getElementById('terminalInputField');
+            const cmd = field.value.trim();
+            if(!cmd) return;
+
+            appendTerminalLine(cmd, 'user-line');
+            field.value = '';
+
+            setTimeout(() => {
+                const normalized = cmd.toLowerCase();
+                let systemReply = "";
+
+                if (normalized.includes('hamaramarket') || normalized.includes('what is this') || normalized.includes('about')) {
+                    systemReply = "HamaraMarket is India's premier framework-free tech ecosystem and structural job portal connecting technical teams, builders, and elite developers across India directly with high-density ventures.";
+                } 
+                else if (normalized.includes('founder') || normalized.includes('who made') || normalized.includes('owner') || normalized.includes('santanu')) {
+                    systemReply = "Founder & Systems Architect: Santanu Konwar. Active Portfolio Ventures: HamaraMarket, FireProduct, and HyperCreators. Core Stack: Pure HTML, CSS, and Vanilla JavaScript.";
+                }
+                else if (normalized.includes('social') || normalized.includes('link') || normalized.includes('github') || normalized.includes('linkedin') || normalized.includes('website')) {
+                    systemReply = "FOUNDER LINKS DIRECTORY:\n" +
+                                  "• Portfolio Ventures: HamaraMarket // FireProduct // HyperCreators\n" +
+                                  "• GitHub: github.com\n" +
+                                  "• LinkedIn: linkedin.com\n" +
+                                  "• X Feed: x.com\n" +
+                                  "(Type or click 'Profile' in the navigation bar to see the complete identity blueprint sheet.)";
+                }
+                else if (normalized.includes('code') || normalized.includes('program') || normalized.includes('marketing') || normalized.includes('seo') || normalized.includes('job') || normalized.includes('rank') || normalized.includes('work') || normalized.includes('remove') || normalized.includes('delete')) {
+                    systemReply = "Console Knowledge Notice: I am optimized for ecosystem directory routing. For specific codebase setups, marketing execution templates, or manual job post removal requests, please execute them directly via the interface dashboards provided on the homepage.";
+                }
+                else {
+                    systemReply = "Command logged into directory buffer. For profile details, type 'founder' or 'links'. To review open tech slots, explore the main Ecosystem Matrix dashboard.";
+                }
+
+                appendTerminalLine(systemReply, 'reply-node');
+            }, 300);
+        }
+
+        function appendTerminalLine(text, cssClass) {
+            const stream = document.getElementById('terminalLogsStream');
+            const line = document.createElement('div');
+            line.className = `terminal-line ${cssClass}`;
+            line.innerText = text;
+            stream.appendChild(line);
+            stream.scrollTop = stream.scrollHeight;
+        }
+
+        function toggleTerminalView() {
+            const body = document.getElementById('terminalConsoleBody');
+            const toggle = document.getElementById('terminalToggleIcon');
+            body.style.display = (body.style.display === 'none') ? 'flex' : 'none';
+            toggle.innerText = (body.style.display === 'none') ? "[ EXPAND ]" : "[ CLOSE ]";
+        }
+
+        /* --- ROUTING NAVIGATION ENGINE --- */
+        function switchView(viewId) {
+            document.querySelectorAll('.view-section').forEach(s => s.classList.remove('active-view'));
+            document.querySelectorAll('nav a').forEach(a => a.classList.remove('active'));
+
+            const targetSection = document.getElementById(`view-${viewId}`);
+            if(targetSection) targetSection.classList.add('active-view');
+
+            const targetLink = document.getElementById(`nav-${viewId}`);
+            if(targetLink) targetLink.classList.add('active');
+
+            window.scrollTo({top: 0, behavior: 'instant'});
+        }
+
+        function switchDocPane(paneId, contextButton) {
+            document.querySelectorAll('.docs-pane').forEach(p => p.classList.remove('active-pane'));
+            document.querySelectorAll('.docs-nav-item').forEach(b => b.classList.remove('active-doc-link'));
+            document.getElementById(`pane-${paneId}`).classList.add('active-pane');
+            contextButton.classList.add('active-doc-link');
+        }
+
+        function executeToastBannerAlert(msg) {
+            const toast = document.getElementById('toastNotification');
+            toast.innerText = msg;
+            toast.style.display = 'block';
+            setTimeout(() => toast.style.display = 'none', 3000);
+        }
+
+        function checkAccessTokens() {
+            if(!sessionStorage.getItem('hm_secure_token_v4')) {
+                setTimeout(() => { document.getElementById('loginGate').style.display = 'flex'; }, 8000);
+            }
+        }
+
+        function handleUserAuthentication(e) {
+            e.preventDefault();
+            sessionStorage.setItem('hm_secure_token_v4', 'AUTHORIZED');
+            document.getElementById('loginGate').style.display = 'none';
+            executeToastBannerAlert("HANDSHAKE AUTHENTICATED");
+        }
+
+        /* --- CORE BOOTSTRAP INITIALIZATION --- */
+        window.onload = () => {
+            initializeEcosystemDataTrack();
+            renderHighDensityMatrixGrid();
+            renderCorporateNewsroomStream();
+            renderEditorialLogsGrid();
+            checkAccessTokens();
+        };
+    </script>
+</body>
+</html>
